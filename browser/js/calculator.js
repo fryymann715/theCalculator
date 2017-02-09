@@ -1,17 +1,23 @@
 ( function() {
-  var data = {
-    memory: '0',
-    current: '0',
-    operation: '',
-    result: '0-',
-    MAX_LENGTH: 11
+
+  function Calculator( domElement ) {
+    this.dom = domElement,
+    this.data = {
+      memory: '0',
+      current: '0',
+      operation: '',
+      result: '0',
+      MAX_LENGTH: 11
+    }
   }
-  var cssClasses = {
+
+  Calculator.cssClasses = {
     GREY_BUTTON_PRESSED: 'calculator-button-grey-pressed',
     ORANGE_BUTTON_PRESSED: 'calculator-operator-button-pressed',
     SMALL_FONT: 'calculator-small-font'
   }
-  var elementSelectors = {
+
+  Calculator.elementSelectors = {
     CLEAR: '.calculator-clear',
     EQUALS: '.calculator-equals',
     TOGGLE_SIGN: '.calculator-toggle-negative',
@@ -22,126 +28,133 @@
     BUTTON_SECTION: '.calculator-button-section',
     OUTPUT: '.calculator-output'
   }
-  var buttons = {
-    ADD: '+',
-    SUBTRACT: '-',
-    MULTIPLY: '*',
-    DIVIDE: '/',
-    EQUALS: '=',
-    ENTER: 'Enter',
-    CLEAR: 'Clear',
-    BACKSPACE: 'Backspace',
-    DELETE: 'Delete',
-    DOT: '.'
 
-  }
-  function divWithDataValue( value ) {
+  Calculator.buttons = {
+      ADD: '+',
+      SUBTRACT: '-',
+      MULTIPLY: '*',
+      DIVIDE: '/',
+      EQUALS: '=',
+      ENTER: 'Enter',
+      CLEAR: 'Clear',
+      BACKSPACE: 'Backspace',
+      DELETE: 'Delete',
+      DOT: '.'
+    }
+
+  Calculator.prototype.divWithDataValue = function ( value ) {
     return `[data-value="${value}"]`
   }
-  function getButton( keyValue ) {
-    return document.querySelector( divWithDataValue( keyValue ) )
+
+  Calculator.prototype.getButton = function ( keyValue ) {
+    return this.dom.querySelector( this.divWithDataValue( keyValue ) )
   }
-  function isOperator( keyValue ) {
-    return keyValue === buttons.ADD
-      || keyValue === buttons.SUBTRACT
-      || keyValue === buttons.DIVIDE
-      || keyValue === buttons.MULTIPLY
+  Calculator.prototype.isOperator = function ( keyValue ) {
+    return keyValue === Calculator.buttons.ADD
+      || keyValue === Calculator.buttons.SUBTRACT
+      || keyValue === Calculator.buttons.DIVIDE
+      || keyValue === Calculator.buttons.MULTIPLY
   }
-  function isEquals( keyValue ) {
-    return keyValue === buttons.ENTER || keyValue === buttons.EQUALS
+  Calculator.prototype.isEquals = function ( keyValue ) {
+    return keyValue === Calculator.buttons.ENTER || keyValue === Calculator.buttons.EQUALS
   }
-  function isClear( keyValue ) {
-    return keyValue === buttons.CLEAR
-      || keyValue === buttons.BACKSPACE
-      || keyValue === buttons.DELETE
+  Calculator.prototype.isClear = function ( keyValue ) {
+    return keyValue === Calculator.buttons.CLEAR
+      || keyValue === Calculator.buttons.BACKSPACE
+      || keyValue === Calculator.buttons.DELETE
   }
-  function isDot( keyValue ) {
-    return keyValue === buttons.DOT
+  Calculator.prototype.isDot = function ( keyValue ) {
+    return keyValue === Calculator.buttons.DOT
   }
-  function isNumber( keyValue ) {
+  Calculator.prototype.isNumber = function ( keyValue ) {
     return parseInt( keyValue ) || keyValue === '0'
   }
-  function isGreyButton( keyValue ) {
-    return keyValue === buttons.CLEAR
+  Calculator.prototype.isGreyButton = function ( keyValue ) {
+    return keyValue === Calculator.buttons.CLEAR
       || parseInt( keyValue )
       || keyValue === '0'
-      || keyValue === buttons.DOT
+      || keyValue === Calculator.buttons.DOT
   }
-  function fakeClickEffect( button, color ) {
-    getButton( button )
+  Calculator.prototype.fakeClickEffect = function ( button, color ) {
+    //FIXME: ghetto binding
+    var me = this
+    this.getButton( button )
       .classList.add( color )
     setTimeout( function() {
-      getButton( button )
+      me.getButton( button )
         .classList.remove( color )
       }, 100 )
   }
 
-  window.onkeydown = function( event ) {
-    isNumber( event.key )
-      ? ( fakeClickEffect( event.key, cssClasses.GREY_BUTTON_PRESSED ),
-        enterDigit( event.key ) )
-      : isOperator( event.key )
-      ? ( fakeClickEffect( event.key, cssClasses.ORANGE_BUTTON_PRESSED ),
-        setOperator( event.key ) )
-      : isEquals( event.key )
-      ? ( fakeClickEffect( buttons.EQUALS, cssClasses.ORANGE_BUTTON_PRESSED ),
-        calculate() )
-      : isClear( event.key )
-      ? ( fakeClickEffect( buttons.CLEAR, cssClasses.GREY_BUTTON_PRESSED ),
-        clearCalculator() )
-      : isDot( event.key )
-      ? ( fakeClickEffect( buttons.DOT, cssClasses.GREY_BUTTON_PRESSED ),
-        addDot() )
-      : null
-  }
-
-  function addListeners() {
-    document.querySelector( elementSelectors.BUTTON_SECTION )
+  Calculator.prototype.addListeners = function () {
+    //FIXME: ghetto binding
+    var me = this
+    this.dom.querySelector( Calculator.elementSelectors.BUTTON_SECTION )
       .addEventListener( 'click', function( event ) {
-        if ( event.target.matches( elementSelectors.NUMBER ) ) {
-          enterDigit( event.target.dataset.value )
+        if ( event.target.matches( Calculator.elementSelectors.NUMBER ) ) {
+          me.enterDigit( event.target.dataset.value )
         } else if (
-          ( event.target.matches( elementSelectors.OPERATOR )) &&
-          ( !event.target.matches( elementSelectors.EQUALS ))
+          ( event.target.matches( Calculator.elementSelectors.OPERATOR )) &&
+          ( !event.target.matches( Calculator.elementSelectors.EQUALS ))
         ) {
-          setOperator( event.target.dataset.value )
-        } else if ( event.target.matches( elementSelectors.CLEAR ) ) {
-          clearCalculator()
-        } else if ( event.target.matches( elementSelectors.EQUALS ) ) {
-          calculate()
-        } else if ( event.target.matches( elementSelectors.TOGGLE_SIGN ) ) {
-          toggleNegativeValue()
-        } else if ( event.target.matches( elementSelectors.DOT ) ) {
-          addDot()
-        } else if ( event.target.matches( elementSelectors.PERCENT ) ) {
-          convertPercent()
+          me.setOperator( event.target.dataset.value )
+        } else if ( event.target.matches( Calculator.elementSelectors.CLEAR ) ) {
+          me.clearCalculator()
+        } else if ( event.target.matches( Calculator.elementSelectors.EQUALS ) ) {
+          me.calculate()
+        } else if ( event.target.matches( Calculator.elementSelectors.TOGGLE_SIGN ) ) {
+          me.toggleNegativeValue()
+        } else if ( event.target.matches( Calculator.elementSelectors.DOT ) ) {
+          me.addDot()
+        } else if ( event.target.matches( Calculator.elementSelectors.PERCENT ) ) {
+          me.convertPercent()
         }
       })
+      this.dom.onkeydown = function( event ) {
+        me.isNumber( event.key )
+          ? ( me.fakeClickEffect( event.key, Calculator.cssClasses.GREY_BUTTON_PRESSED ),
+            me.enterDigit( event.key ) )
+          : me.isOperator( event.key )
+          ? ( me.fakeClickEffect( event.key, Calculator.cssClasses.ORANGE_BUTTON_PRESSED ),
+            me.setOperator( event.key ) )
+          : me.isEquals( event.key )
+          ? ( me.fakeClickEffect( Calculator.buttons.EQUALS, Calculator.cssClasses.ORANGE_BUTTON_PRESSED ),
+            me.calculate() )
+          : me.isClear( event.key )
+          ? ( me.fakeClickEffect( Calculator.buttons.CLEAR, Calculator.cssClasses.GREY_BUTTON_PRESSED ),
+            me.clearCalculator() )
+          : me.isDot( event.key )
+          ? ( me.fakeClickEffect( Calculator.buttons.DOT, Calculator.cssClasses.GREY_BUTTON_PRESSED ),
+            me.addDot() )
+          : null
+      }
   }
-  addListeners()
-
-  function setOutput( text ) {
+  Calculator.prototype.setOutput = function ( text ) {
+    //FIXME: ghetto binding
+    var me = this
     if ( text ) {
-      if ( text.length > data.MAX_LENGTH ) {
-        shrinkFontSize()
+      if ( text.length > this.data.MAX_LENGTH ) {
+        me.shrinkFontSize()
       }
-      document.querySelector( elementSelectors.OUTPUT ).innerHTML = text
+      this.dom.querySelector( Calculator.elementSelectors.OUTPUT ).innerHTML = text
     } else {
-      if ( data.current.length > data.MAX_LENGTH ) {
-        shrinkFontSize()
+      if ( this.data.current.length > this.data.MAX_LENGTH ) {
+        me.shrinkFontSize()
       }
-      document.querySelector( elementSelectors.OUTPUT ).innerHTML = data.current
+      this.dom.querySelector( Calculator.elementSelectors.OUTPUT ).innerHTML = this.data.current
     }
   }
-  function setResult( number ) {
-    data.result = number.toString()
-    data.memory = data.result
+  Calculator.prototype.setResult = function ( number ) {
+    this.data.result = number.toString()
+    this.data.memory = this.data.result
   }
-  function clearResult() {
-    data.result = ''
+  Calculator.prototype
+  .clearResult = function () {
+    this.data.result = ''
   }
-  function resetData() {
-    data = {
+  Calculator.prototype
+  .resetData = function () {
+    this.data = {
       memory: '0',
       current: '0',
       operation: '',
@@ -149,102 +162,113 @@
       MAX_LENGTH: 11
     }
   }
-  function shrinkFontSize() {
-    document.querySelector( elementSelectors.OUTPUT )
-      .classList.add( cssClasses.SMALL_FONT )
+  Calculator.prototype.shrinkFontSize = function () {
+    this.dom.querySelector( Calculator.elementSelectors.OUTPUT )
+      .classList.add( Calculator.cssClasses.SMALL_FONT )
   }
-  function resetFontSize() {
-    document.querySelector( elementSelectors.OUTPUT )
-      .classList.remove( cssClasses.SMALL_FONT )
+  Calculator.prototype.resetFontSize = function () {
+    this.dom.querySelector( Calculator.elementSelectors.OUTPUT )
+      .classList.remove( Calculator.cssClasses.SMALL_FONT )
   }
-
-  function enterDigit( number ) {
-    var current = data.current
-    if ( current === '0' || data.memory === data.result ) {
-      clearResult()
+  Calculator.prototype.enterDigit = function ( number ) {
+    var me = this
+    var current = this.data.current
+    if ( current === '0' || this.data.memory === this.data.result ) {
+      me.clearResult()
       current = ''
     }
-    if ( current.length === data.MAX_LENGTH ) {
-      shrinkFontSize()
+    if ( this.data.current.length === this.data.MAX_LENGTH ) {
+      me.shrinkFontSize()
     }
     current += number
-    data.current = current
-    setOutput()
+    this.data.current = current
+    me.setOutput()
   }
-  function setOperator( operation ) {
-    if ( data.memory === data.result ) {
-      data.memory = data.result
+  Calculator.prototype.setOperator = function ( operation ) {
+    //FIXME: ghetto binding
+    var me = this
+    if ( me.data.memory === me.data.result ) {
+      me.data.memory = me.data.result
     } else {
-      data.memory = data.current
+      me.data.memory = me.data.current
     }
-    data.current = '0'
-    data.operation = operation
+    me.data.current = '0'
+    me.data.operation = operation
   }
-  function clearCalculator() {
-    if ( data.current === '0' ) {
-      resetData()
-      setOutput()
+  Calculator.prototype.clearCalculator = function () {
+    if ( this.data.current === '0' ) {
+      this.resetData()
+      this.setOutput()
     } else {
-      resetFontSize()
-      data.current = '0'
-      setOutput()
+      this.resetFontSize()
+      this.data.current = '0'
+      this.setOutput()
     }
   }
-  function toggleNegativeValue() {
-    if ( data.current.indexOf( '-' ) === -1 ) {
-      data.current = '-' + data.current
+  Calculator.prototype.toggleNegativeValue = function () {
+    if ( this.data.current.indexOf( '-' ) === -1 ) {
+      this.data.current = '-' + this.data.current
     } else {
-      data.current = data.current.substring( 1 )
+      this.data.current = this.data.current.substring( 1 )
     }
-    setOutput()
+    this.setOutput()
   }
-  function convertPercent() {
-    if ( data.memory === '0' ) {
-      data.current = ( parseFloat( data.current ) / 100 ).toString()
-      setOutput()
+  Calculator.prototype.convertPercent = function () {
+    if ( this.data.memory === '0' ) {
+      this.data.current = ( parseFloat( this.data.current ) / 100 ).toString()
+      this.setOutput()
     } else {
-      data.current = (
-        (parseFloat( data.current ) / parseFloat( data.memory )
+      this.data.current = (
+        (parseFloat( this.data.current ) / parseFloat( this.data.memory )
       ) * 100 ).toString()
-      setOutput()
+      this.setOutput()
     }
   }
-  function addDot() {
-    if ( data.current.indexOf( '.' ) === -1 ) {
-      data.current = data.current + '.'
-      setOutput()
+  Calculator.prototype.addDot = function () {
+    if ( this.data.current.indexOf( '.' ) === -1 ) {
+      this.data.current = this.data.current + '.'
+      this.setOutput()
     }
   }
 
-  function calculate() {
-    if ( !(data.memory === '0' && data.current === '0') ) {
-      switch( data.operation ) {
-        case buttons.ADD:
-          add()
+  Calculator.prototype.calculate = function () {
+    if ( !(this.data.memory === '0' && this.data.current === '0') ) {
+      switch( this.data.operation ) {
+        case Calculator.buttons.ADD:
+          this.add()
           break;
-        case buttons.SUBTRACT:
-          subtract()
+        case Calculator.buttons.SUBTRACT:
+          this.subtract()
           break;
-        case buttons.MULTIPLY:
-          multiply()
+        case Calculator.buttons.MULTIPLY:
+          this.multiply()
           break;
-        case buttons.DIVIDE:
-          divide()
+        case Calculator.buttons.DIVIDE:
+          this.divide()
           break;
       }
-      setOutput( data.result )
+      this.setOutput( this.data.result )
     }
   }
-  function add() {
-    setResult( parseFloat( data.memory ) + parseFloat( data.current ) )
+  Calculator.prototype.add = function () {
+    this.setResult(
+      parseFloat( this.data.memory ) + parseFloat( this.data.current ) )
   }
-  function subtract() {
-    setResult( parseFloat( data.memory ) - parseFloat( data.current ) )
+  Calculator.prototype.subtract = function () {
+    this.setResult(
+      parseFloat( this.data.memory ) - parseFloat( this.data.current ) )
   }
-  function multiply() {
-    setResult( parseFloat( data.memory ) * parseFloat( data.current ) )
+  Calculator.prototype.multiply = function () {
+    this.setResult(
+      parseFloat( this.data.memory ) * parseFloat( this.data.current ) )
   }
-  function divide() {
-    setResult( parseFloat( data.memory ) / parseFloat( data.current ) )
+  Calculator.prototype.divide = function () {
+    this.setResult(
+      parseFloat( this.data.memory ) / parseFloat( this.data.current ) )
   }
+
+  document.querySelectorAll( '.calculator' ).forEach( function( calculator ) {
+    var calc = new Calculator( calculator )
+    calc.addListeners()
+  })
 }) ()
