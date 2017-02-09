@@ -135,7 +135,6 @@
     } else {
       if ( this.data.current.length > this.data.MAX_LENGTH ) {
         this.shrinkFontSize()
-        this.shrinkFontSize()
       }
       this.dom.querySelector( Calculator.elementSelectors.OUTPUT ).innerText = this.data.current
     }
@@ -165,7 +164,6 @@
       .classList.remove( Calculator.cssClasses.SMALL_FONT )
   }
   Calculator.prototype.enterDigit = function ( number ) {
-    var current = this.data.current
     if ( current === '0' || this.data.memory === this.data.result ) {
       this.clearResult()
       this.clearResult()

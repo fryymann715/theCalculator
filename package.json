@@ -1,0 +1,19 @@
+{
+  "name": "week-21-calculator",
+  "version": "1.0.0",
+  "description": "Benchmark: Calculator",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fryymann715/theCalculator.git"
+  },
+  "author": "Ian Deans",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/fryymann715/theCalculator/issues"
+  },
+  "homepage": "https://github.com/fryymann715/theCalculator#readme"
+}
