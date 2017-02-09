@@ -9,8 +9,11 @@
       result: '0',
       MAX_LENGTH: 11
     },
+<<<<<<< HEAD
     this.onButtonClick = this.onButtonClick.bind( this ),
     this.onKeyPress = this.onKeyPress.bind( this ),
+=======
+>>>>>>> wipmo
     this.addListeners()
   }
   Calculator.cssClasses = {
