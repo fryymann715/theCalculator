@@ -1,4 +1,7 @@
 # Calculator Benchmark
+Clone repo, open calculator.html file in browser.
+
+
 
 ## Specs
 
